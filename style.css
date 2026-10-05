@@ -1,0 +1,711 @@
+/* ==========================================================================
+   INCLUSIVE SMART FORM BUILDER — STYLESHEET
+   Design tokens are defined as CSS custom properties on :root so that
+   High Contrast Mode and Large Text Mode can override them by swapping
+   a class on <body> (see script.js: toggleHighContrast / toggleLargeText).
+   ========================================================================== */
+
+:root {
+  /* --- Color palette ------------------------------------------------- */
+  --color-bg: #eef1f4;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f5f7f9;
+  --color-border: #d6dde2;
+  --color-border-strong: #aeb9c2;
+
+  --color-text: #1a2226;
+  --color-text-muted: #52616b;
+
+  --color-primary: #1f4b4c;      /* deep teal-ink, main brand color   */
+  --color-primary-dark: #163736;
+  --color-primary-contrast: #ffffff;
+
+  --color-accent: #c9822a;       /* warm amber — decorative use (badges, borders) */
+  --color-accent-text: #9c6418;  /* darker amber — used for TEXT so it keeps 4.5:1 contrast */
+  --color-success: #256048;      /* darkened from the original #2e7d5b to clear 4.5:1 on its backgrounds */
+  --color-success-bg: #e6f3ec;
+  --color-error: #a83a25;
+  --color-error-bg: #fbeae6;
+
+  --color-focus-ring: #0b63c1;
+
+  /* --- Typography ------------------------------------------------------ */
+  --font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.15rem;
+  --font-size-xl: 1.5rem;
+  --font-size-xxl: 1.85rem;
+  --line-height-base: 1.5;
+
+  /* --- Spacing & shape --------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE
+   Toggled via document.body.classList.toggle("high-contrast") in script.js
+   ========================================================================== */
+body.high-contrast {
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-surface-sunken: #0d0d0d;
+  --color-border: #ffffff;
+  --color-border-strong: #ffffff;
+
+  --color-text: #ffffff;
+  --color-text-muted: #f2f2f2;
+
+  --color-primary: #ffe066;
+  --color-primary-dark: #ffd23f;
+  --color-primary-contrast: #000000;
+
+  --color-accent: #ffe066;
+  --color-accent-text: #ffe066; /* bright yellow on black already clears 4.5:1 by a wide margin */
+  --color-success: #7cffb2;
+  --color-success-bg: #003319;
+  --color-error: #ff8a75;
+  --color-error-bg: #330d05;
+
+  --color-focus-ring: #ffe066;
+}
+
+/* ==========================================================================
+   LARGE TEXT MODE
+   Toggled via document.body.classList.toggle("large-text") in script.js
+   ========================================================================== */
+body.large-text {
+  --font-size-base: 19px;
+  --font-size-sm: 1rem;
+  --font-size-md: 1.15rem;
+  --font-size-lg: 1.3rem;
+  --font-size-xl: 1.7rem;
+  --font-size-xxl: 2.1rem;
+}
+
+/* ==========================================================================
+   BASE / RESET
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-size-base);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: var(--line-height-base);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  color: var(--color-text);
+}
+
+p {
+  margin: 0 0 var(--space-2) 0;
+}
+
+ul, ol, dl {
+  margin: 0;
+  padding: 0;
+}
+
+code {
+  background: var(--color-surface-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  font-size: 0.9em;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY UTILITIES
+   ========================================================================== */
+
+/* Keyboard focus is always clearly visible; never removed without replacement */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  padding: var(--space-2) var(--space-4);
+  z-index: 100;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.visually-hidden-input,
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.app-header {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 4px solid var(--color-accent);
+}
+
+.app-header__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.app-header__title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.app-header__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.app-header__title {
+  font-size: var(--font-size-xxl);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.app-header__subtitle {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-md);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.high-contrast .app-header__subtitle {
+  color: var(--color-text-muted);
+}
+
+.app-header__controls {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+.app-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  display: grid;
+  grid-template-columns: 1.1fr 1.25fr 0.85fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .app-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .panel--status {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+  .panel--status {
+    grid-column: auto;
+  }
+}
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.panel--config {
+  border-top: 4px solid var(--color-primary);
+}
+
+.panel--preview {
+  border-top: 4px solid var(--color-accent);
+}
+
+.panel--status {
+  border-top: 4px solid var(--color-success);
+  position: sticky;
+  top: var(--space-5);
+}
+
+@media (max-width: 1100px) {
+  .panel--status {
+    position: static;
+  }
+}
+
+.panel__title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-4);
+}
+
+.panel__subtitle {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-2);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-5) 0;
+}
+
+.hint-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   FORM CONTROLS (shared between config panel and generated preview)
+   ========================================================================== */
+.config-block {
+  margin-bottom: var(--space-4);
+}
+
+.config-block label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-md);
+}
+
+.config-block--checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.config-block--checkbox label {
+  margin-bottom: 0;
+  font-weight: 400;
+}
+
+.text-input,
+select.text-input {
+  width: 100%;
+  padding: var(--space-3);
+  font-size: var(--font-size-md);
+  font-family: inherit;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.text-input:focus {
+  border-color: var(--color-focus-ring);
+}
+
+input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+legend {
+  padding: 0;
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-3);
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.btn:hover {
+  filter: brightness(0.96);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.btn--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.6);
+  color: var(--color-primary-contrast);
+}
+
+body.high-contrast .btn--ghost {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+
+.btn--file-label {
+  cursor: pointer;
+}
+
+.btn--icon {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.btn--danger {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+/* ==========================================================================
+   FIELD CARDS (configuration list)
+   ========================================================================== */
+.field-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.field-card {
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-sunken);
+}
+
+.field-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.field-card__meta {
+  min-width: 0;
+}
+
+.field-card__label {
+  font-weight: 700;
+  font-size: var(--font-size-md);
+  word-break: break-word;
+}
+
+.field-card__type {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.field-card__badge {
+  display: inline-block;
+  font-size: var(--font-size-sm);
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  margin-top: var(--space-1);
+}
+
+.field-card__badge--required {
+  background: var(--color-accent);
+  color: #2c1a02;
+}
+
+.field-card__badge--optional {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.field-card__actions {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: var(--space-3) 0;
+}
+
+/* ==========================================================================
+   MESSAGES / ALERTS
+   ========================================================================== */
+.form-message {
+  font-size: var(--font-size-sm);
+  min-height: 1.2em;
+}
+
+.form-message--error {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.form-message--success {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   GENERATED FORM (live preview)
+   ========================================================================== */
+.generated-form__title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-4);
+}
+
+.form-field {
+  margin-bottom: var(--space-5);
+}
+
+.form-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.required-marker {
+  color: var(--color-accent-text); /* darker than --color-accent so the asterisk clears 4.5:1 as text */
+  font-weight: 700;
+  margin-left: 0.2em;
+}
+
+body.high-contrast .required-marker {
+  color: var(--color-accent-text);
+}
+
+.form-field__control {
+  width: 100%;
+  padding: var(--space-3);
+  font-size: var(--font-size-md);
+  font-family: inherit;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.form-field--checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.form-field--checkbox label {
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
+/* Invalid state is communicated through text AND a visible border change,
+   never through color alone (see .error-message below). */
+.form-field__control[aria-invalid="true"] {
+  border-color: var(--color-error);
+  border-width: 2px;
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-1);
+  min-height: 1.2em;
+}
+
+.error-message:not(:empty)::before {
+  content: "\26A0 ";
+}
+
+.form-status-region {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.form-status-region:empty {
+  padding: 0;
+}
+
+.form-status-region--success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+
+.form-status-region--error {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+
+.generated-form__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+/* ==========================================================================
+   STATUS PANEL
+   ========================================================================== */
+.status-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.status-checklist li::marker {
+  content: "";
+}
+
+.status-stats {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.status-stats__item {
+  background: var(--color-surface-sunken);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  flex: 1;
+  text-align: center;
+}
+
+.status-stats__item dt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.status-stats__item dd {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+body.high-contrast .status-stats__item dd {
+  color: var(--color-accent);
+}
+
+.status-note {
+  margin-top: var(--space-2);
+}
+
+.testing-details {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.testing-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.testing-details ol,
+.testing-details ul {
+  margin-top: var(--space-2);
+  padding-left: var(--space-5);
+}
+
+.testing-details li {
+  margin-bottom: var(--space-1);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.app-footer {
+  text-align: center;
+  padding: var(--space-5);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

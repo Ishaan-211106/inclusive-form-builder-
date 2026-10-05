@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inclusive Smart Form Builder</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Skip link for keyboard/screen-reader users -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="app-header">
+    <div class="app-header__inner">
+      <div class="app-header__title-group">
+        <span class="app-header__icon" aria-hidden="true">&#9878;</span>
+        <div>
+          <h1 class="app-header__title">Inclusive Smart Form Builder</h1>
+          <p class="app-header__subtitle">Build accessible, validated forms using Vanilla JavaScript.</p>
+        </div>
+      </div>
+      <div class="app-header__controls" role="group" aria-label="Display preferences">
+        <button type="button" id="toggle-contrast" class="btn btn--ghost" aria-pressed="false">
+          High Contrast: <span id="contrast-state">Off</span>
+        </button>
+        <button type="button" id="toggle-large-text" class="btn btn--ghost" aria-pressed="false">
+          Large Text: <span id="large-text-state">Off</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="app-layout">
+
+    <!-- ============================================================ -->
+    <!-- 1. FORM CONFIGURATION PANEL                                   -->
+    <!-- ============================================================ -->
+    <section class="panel panel--config" aria-labelledby="config-heading">
+      <h2 id="config-heading" class="panel__title">Form Configuration</h2>
+
+      <div class="config-block">
+        <label for="form-title-input" class="config-block__label">Form title</label>
+        <input
+          type="text"
+          id="form-title-input"
+          class="text-input"
+          value="Student Registration Form"
+          aria-describedby="form-title-hint"
+        >
+        <p id="form-title-hint" class="hint-text">This appears as the heading of the generated form.</p>
+      </div>
+
+      <div class="divider" role="separator"></div>
+
+      <form id="add-field-form" class="add-field-form" novalidate>
+        <fieldset>
+          <legend class="config-block__label">Add a field</legend>
+
+          <div class="config-block">
+            <label for="field-type-select">Field type</label>
+            <select id="field-type-select" class="text-input">
+              <option value="text">Text</option>
+              <option value="email">Email</option>
+              <option value="phone">Phone</option>
+              <option value="select">Dropdown</option>
+              <option value="checkbox">Checkbox</option>
+            </select>
+          </div>
+
+          <div class="config-block">
+            <label for="field-label-input">Field label</label>
+            <input type="text" id="field-label-input" class="text-input" placeholder="e.g. Date of Birth">
+          </div>
+
+          <div class="config-block" id="placeholder-block">
+            <label for="field-placeholder-input">Placeholder text (optional)</label>
+            <input type="text" id="field-placeholder-input" class="text-input" placeholder="e.g. Enter your date of birth">
+          </div>
+
+          <div class="config-block" id="options-block" hidden>
+            <label for="field-options-input">Dropdown options</label>
+            <input type="text" id="field-options-input" class="text-input" placeholder="Comma-separated, e.g. CSE, ECE, EEE">
+            <p class="hint-text">Separate each option with a comma.</p>
+          </div>
+
+          <div class="config-block config-block--checkbox">
+            <input type="checkbox" id="field-required-input">
+            <label for="field-required-input">This field is required</label>
+          </div>
+
+          <p id="add-field-error" class="form-message form-message--error" role="alert"></p>
+
+          <button type="submit" class="btn btn--primary">Add field</button>
+        </fieldset>
+      </form>
+
+      <div class="divider" role="separator"></div>
+
+      <h3 class="panel__subtitle">Configured fields</h3>
+      <p class="hint-text">Use the Up / Down buttons to reorder, or Delete to remove a field.</p>
+      <!-- Announces add/delete/reorder/edit actions to screen-reader users even though
+           their keyboard focus stays on the button they just pressed. See updateAccessibilityStatus()
+           and announce() in script.js. -->
+      <p id="config-live-status" class="visually-hidden" role="status" aria-live="polite"></p>
+      <ul id="field-list" class="field-list" aria-label="Configured form fields" tabindex="-1"></ul>
+
+      <div class="config-actions">
+        <button type="button" id="reset-builder-btn" class="btn btn--secondary">Reset form builder</button>
+        <button type="button" id="export-json-btn" class="btn btn--secondary">Export configuration (JSON)</button>
+        <label for="import-json-input" class="btn btn--secondary btn--file-label">
+          Import configuration (JSON)
+          <input type="file" id="import-json-input" accept="application/json" class="visually-hidden-input">
+        </label>
+      </div>
+      <p id="config-io-message" class="form-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 2. LIVE FORM PREVIEW                                          -->
+    <!-- ============================================================ -->
+    <section class="panel panel--preview" aria-labelledby="preview-heading">
+      <h2 id="preview-heading" class="panel__title">Live Form Preview</h2>
+      <p class="hint-text">This is the actual generated form. Try filling it in and submitting it.</p>
+      <div id="form-preview-mount"></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 3. ACCESSIBILITY / STATUS AREA                                -->
+    <!-- ============================================================ -->
+    <aside class="panel panel--status" aria-labelledby="status-heading">
+      <h2 id="status-heading" class="panel__title">Accessibility Status</h2>
+      <ul class="status-checklist">
+        <li>&#10003; Semantic labels enabled</li>
+        <li>&#10003; Required fields use ARIA (<code>aria-required</code>)</li>
+        <li>&#10003; Error messages are screen-reader associated (<code>aria-describedby</code>)</li>
+        <li>&#10003; Keyboard navigation supported</li>
+        <li>&#10003; Live validation enabled</li>
+      </ul>
+      <dl class="status-stats">
+        <div class="status-stats__item">
+          <dt>Fields configured</dt>
+          <dd id="stat-total-fields">0</dd>
+        </div>
+        <div class="status-stats__item">
+          <dt>Required fields</dt>
+          <dd id="stat-required-fields">0</dd>
+        </div>
+      </dl>
+      <p class="hint-text status-note">
+        This panel reflects features implemented in this project. It is not a certified WCAG compliance score.
+      </p>
+
+      <div class="divider" role="separator"></div>
+
+      <h3 class="panel__subtitle">Testing &amp; Accessibility</h3>
+      <details class="testing-details">
+        <summary>Keyboard test</summary>
+        <ol>
+          <li>Press Tab repeatedly and confirm every control receives a visible focus outline.</li>
+          <li>Use Enter or Space to activate buttons.</li>
+          <li>Complete and submit the form using only the keyboard.</li>
+        </ol>
+      </details>
+      <details class="testing-details">
+        <summary>Validation test</summary>
+        <ol>
+          <li>Leave a required field empty and submit.</li>
+          <li>Enter an invalid email or phone number.</li>
+          <li>Leave a dropdown unselected.</li>
+          <li>Leave a required checkbox unchecked.</li>
+          <li>Correct each value and confirm the error disappears.</li>
+        </ol>
+      </details>
+      <details class="testing-details">
+        <summary>Automated accessibility test</summary>
+        <p>Open Chrome DevTools &rarr; Lighthouse &rarr; Accessibility, and separately inspect the Accessibility tree under Elements &rarr; Accessibility.</p>
+      </details>
+    </aside>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Inclusive Smart Form Builder &mdash; a PBL project demonstrating accessible, client-side form generation with Vanilla JavaScript.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
